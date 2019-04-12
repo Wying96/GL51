@@ -20,6 +20,6 @@ class StudentControllerSpec extends Specification {
         HttpResponse response = client.toBlocking().exchange("/student")
 
         expect:
-        response.status == HttpStatus.NO_CONTENT
+        response.status == HttpStatus.OK
     }
 }
