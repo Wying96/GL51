@@ -23,10 +23,33 @@ class MemoryProductStorageTest extends Specification {
         all.first().name == 'myproduct'
     }
 
-    def "update a product in the list returns a new list"() {
+    def "adding a product will generate a new id"() {
+        setup:
+        store.save(new Product(name: "myproduct"))
+
+        when:
+        def all = store.all()
+
+        then:
+        all.first().id != null
+    }
+
+    def "deleting a product will remove it from the list"() {
+        setup:
+        Product p = new Product(id: "1", name: "myproduct")
+        store.save(p)
+
+        when:
+        store.delete("1")
+        def all= store.all()
+
+        then:
+        all.contains(p) == false
+    }
+
+    def "modifying a product will change it in the list"() {
         store.save(new Product(id: "1", name: "myproduct"))
         Product newProduct = new Product(
-                id: "10",
                 name: "myproduct updated",
                 description: "new product",
                 price: 2.50,
@@ -35,24 +58,25 @@ class MemoryProductStorageTest extends Specification {
         store.update("1", newProduct)
 
         when:
-        def proInStore = store.getByID(newProduct.id)
+        def proInStore = store.getByID("1")
 
         then:
         proInStore == newProduct
     }
 
-    def "get a product by id"() {
+    def "getting a product by its id will throw a NotExistingProductException if it does not exits"() {
+        setup:
+        store.save(new Product(id: "1", name: "myproduct"))
+        when:
+        store.getByID("2")
+        then:
+        thrown NotExistingProductException
+    }
+
+    def "getting a product by its id will return it if it does exist"() {
         store.save(new Product(id: "1", name: "myproduct"))
         expect:
         store.getByID("1").name=='myproduct'
-    }
-
-    def "delete a product by id"() {
-        store.save(new Product(id: "1", name: "myproduct"))
-        store.save(new Product(id: "2", name: "myproduct2"))
-        store.delete("1")
-        expect:
-        store.getByID("1") == null
     }
 
 }
