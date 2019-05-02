@@ -49,9 +49,10 @@ class MemoryProductStorageTest extends Specification {
 
     def "delete a product by id"() {
         store.save(new Product(id: "1", name: "myproduct"))
+        store.save(new Product(id: "2", name: "myproduct2"))
         store.delete("1")
         expect:
-        store.all() == []
+        store.getByID("1") == null
     }
 
 }
