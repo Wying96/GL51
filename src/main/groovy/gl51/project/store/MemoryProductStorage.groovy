@@ -2,6 +2,8 @@ package gl51.project.store
 
 class MemoryProductStorage implements  ProductStorage {
 
+    //HashMap<String, String> productHashMap = new HashMap<>();
+    //TODO: HashMap  1.<id, Product> ? 2.<Product.key, Product.value>?
     List<Product> products = []
 
     @Override
