@@ -1,6 +1,7 @@
 package gl51.project
 
 import io.micronaut.context.ApplicationContext
+import io.micronaut.core.type.Argument
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.HttpResponse
@@ -17,9 +18,12 @@ class StudentControllerSpec extends Specification {
 
     void "test index"() {
         given:
-        HttpResponse response = client.toBlocking().exchange("/student")
+        def response = client.toBlocking().exchange("/student", Argument.listOf(Student).type)
 
         expect:
         response.status == HttpStatus.OK
+        response.body()[0].firstName == 'Sébastien'
+        response.body()[0].lastName == 'Gadot'
+
     }
 }
