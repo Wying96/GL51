@@ -7,10 +7,11 @@ class MemoryProductStorage implements  ProductStorage {
     List<Product> products = []
 
     @Override
-    void save(Product p) {
+    String save(Product p) {
         if(!p.id)
             p.id = UUID.randomUUID().toString()
         this.products.add(p)
+        return p.id
     }
 
     @Override
