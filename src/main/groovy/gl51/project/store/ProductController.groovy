@@ -26,21 +26,30 @@ class ProductController {
         try {
             storage.getByID(id)
         }
-        catch(NoSuchElementException e) {
-            null
+        catch(NotExistingProductException e) {
+            HttpStatus.NOT_FOUND
         }
     }
 
     @Put("/{id}")
     void update(@Body Product p,@Body String id){
-        HttpStatus.OK
-        storage.update(id, p)
+        try {
+            storage.update(id, p)
+            HttpStatus.OK
+        }
+        catch(NotExistingProductException e) {
+            HttpStatus.NOT_FOUND
+        }
     }
 
     @Delete("/{id}")
-    void delete(@Body String id){
-        HttpStatus.OK
-        storage.delete(id)
+    void delete(String id) {
+        try {
+            storage.delete(id)
+            HttpStatus.OK
+        } catch (NotExistingProductException  e) {
+            HttpStatus.NOT_FOUND
+        }
     }
 
 }

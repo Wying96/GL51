@@ -39,20 +39,20 @@ class ProductControllerSpec extends Specification {
 
         when:
         String id = client.toBlocking().retrieve(HttpRequest.POST('/products', newProduct))
-        Product getProduct = client.toBlocking().retrieve(HttpRequest.GET('/products/'+id), Argument.of(Product).type)
+        Product findProduct = client.toBlocking().retrieve(HttpRequest.GET('/products/'+id), Argument.of(Product).type)
 
         then:
-        getProduct.name = newProduct.name
-        getProduct.description = newProduct.description
-        getProduct.price = newProduct.price
-        getProduct.idealTemperature = newProduct.idealTemperature
+        findProduct.name ==newProduct.name
+        findProduct.description == newProduct.description
+        findProduct.price == newProduct.price
+        findProduct.idealTemperature == newProduct.idealTemperature
 
         where:
         name | description | price | idealTemperature
-        "WU" | "ying" | 0.0 | 123000
+        "aaa" | "bbb" | 0.0 | 123000
     }
 
-//
+
 //    void "test read by id"() {
 //        given:
 //        def response = client.toBlocking().retrieve(HttpRequest.GET('/products'), Argument.listOf(Product).type)
@@ -61,23 +61,43 @@ class ProductControllerSpec extends Specification {
 //        response.status == HttpStatus.OK
 //        response.body()==[]
 //    }
-//
-//    void "update one product"() {
-//        given:
-//        def response = client.toBlocking().retrieve(HttpRequest.GET('/products'), Argument.listOf(Product).type)
-//
-//        expect:
-//        response.status == HttpStatus.OK
-//        response.body()==[]
-//    }
-//
-//    void "delete one product"() {
-//        given:
-//        def response = client.toBlocking().retrieve(HttpRequest.GET('/products'), Argument.listOf(Product).type)
-//
-//        expect:
-//        response.status == HttpStatus.OK
-//        response.body()==[]
-//    }
+
+    void "update one product"() {
+        setup:
+        Product oldProduct = new Product(name: name, description: description, price: price, idealTemperature: idealTemperature)
+        Product newProduct = new Product(name: name1, description: description1, price: price1, idealTemperature: idealTemperature1)
+
+        when:
+        String id = client.toBlocking().retrieve(HttpRequest.POST('/products', oldProduct))
+        client.toBlocking().retrieve(HttpRequest.PUT('/products/' + id, newProduct), Argument.of(HttpStatus).type)
+        Product updatedProduct = client.toBlocking().retrieve(HttpRequest.GET('/products/' + id), Argument.of(Product).type)
+
+        then:
+        updatedProduct.description == newProduct.description
+        updatedProduct.price == newProduct.price
+        updatedProduct.name == newProduct.name
+        updatedProduct.idealTemperature == newProduct.idealTemperature
+
+        where:
+        name  | description | price | idealTemperature | name1 | description1 | price1  | idealTemperature1
+        "aaa" | "bbb"       | 0.0   | 123000           | "ccc" | "ddd"        | 56465.3 | 64351568
+    }
+
+    void "delete one product"() {
+        setup:
+        Product newProduct = new Product(name: name, description: description, price: price, idealTemperature: idealTemperature)
+        String id = client.toBlocking().retrieve(HttpRequest.POST('/products', newProduct))
+
+        when:
+        client.toBlocking().retrieve(HttpRequest.DELETE('/products/'+ id))
+        Product product = client.toBlocking().retrieve(HttpRequest.GET('/product/' + id), Argument.of(Product).type)
+
+        then:
+        thrown HttpClientResponseException
+        
+        where:
+        name  | description | price | idealTemperature
+        "aaa" | "bbb"       | 0.0   | 123000
+    }
 
 }
