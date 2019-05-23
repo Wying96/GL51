@@ -52,23 +52,13 @@ class ProductControllerSpec extends Specification {
         "aaa" | "bbb" | 0.0 | 123000
     }
 
-
-//    void "test read by id"() {
-//        given:
-//        def response = client.toBlocking().retrieve(HttpRequest.GET('/products'), Argument.listOf(Product).type)
-//
-//        expect:
-//        response.status == HttpStatus.OK
-//        response.body()==[]
-//    }
-
     void "update one product"() {
         setup:
         Product oldProduct = new Product(name: name, description: description, price: price, idealTemperature: idealTemperature)
         Product newProduct = new Product(name: name1, description: description1, price: price1, idealTemperature: idealTemperature1)
+        String id = client.toBlocking().retrieve(HttpRequest.POST('/products', oldProduct))
 
         when:
-        String id = client.toBlocking().retrieve(HttpRequest.POST('/products', oldProduct))
         client.toBlocking().retrieve(HttpRequest.PUT('/products/' + id, newProduct), Argument.of(HttpStatus).type)
         Product updatedProduct = client.toBlocking().retrieve(HttpRequest.GET('/products/' + id), Argument.of(Product).type)
 
@@ -94,7 +84,7 @@ class ProductControllerSpec extends Specification {
 
         then:
         thrown HttpClientResponseException
-        
+
         where:
         name  | description | price | idealTemperature
         "aaa" | "bbb"       | 0.0   | 123000
